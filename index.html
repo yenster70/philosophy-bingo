@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ancient Philosophy Bingo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f1e3; /* A warm, paper-like background */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border: 2px solid #e0c8a6;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: #4a2e1f; /* A deep, earthy brown */
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            color: #6a4a39;
+            margin-bottom: 25px;
+        }
+
+        #bingo-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-gap: 10px;
+            padding: 10px;
+            border: 2px solid #b3a38a;
+            border-radius: 10px;
+            background-color: #e6e0d4;
+        }
+
+        .bingo-square {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            min-height: clamp(50px, 10vw, 90px);
+            background-color: #faf7f0;
+            border: 1px solid #dcd7c9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+            line-height: 1.3;
+            text-align: center;
+            user-select: none;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .bingo-square:hover:not(.daubed) {
+            background-color: #fff;
+            transform: scale(1.02);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .daubed {
+            background-color: #8c735d; /* A rich, deep brown for the daub */
+            color: #fff;
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            pointer-events: none; /* Disable clicking after daubing */
+        }
+        
+        #free-space {
+            font-weight: 600;
+            background-color: #b3a38a;
+            color: #fff;
+        }
+
+        .message-box {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a2e1f;
+            min-height: 25px;
+        }
+        
+        .win-message {
+            color: #2b7a0d; /* A celebratory green */
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        button {
+            background-color: #5d5140; /* A dark, sophisticated button color */
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #796857;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            #bingo-grid {
+                grid-gap: 5px;
+            }
+            .bingo-square {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Ancient Philosophy Bingo</h1>
+    <p class="subtitle">Find a classmate who fits a square. Mark five in a row to win!</p>
+    <div id="bingo-grid"></div>
+    <div id="message-box" class="message-box"></div>
+    <button id="new-game-btn">New Game</button>
+</div>
+
+<script>
+    // This array holds all the possible phrases for the bingo board.
+    // The phrases are designed to be relevant to a first-day Ancient Philosophy class.
+    const bingoPhrases = [
+        "Find someone who knows what 'eudaimonia' means.",
+        "Talk to someone who can define the 'Socratic Method'.",
+        "Found someone who has heard of Epicureanism.",
+        "A student who knows what 'The Academy' was.",
+        "Find someone who can name one of Plato's famous dialogues.",
+        "Someone who thinks they're a modern-day Stoic.",
+        "Find someone who has read a fragment from Heraclitus.",
+        "Someone who knows what the 'Allegory of the Cave' represents.",
+        "Talk to someone who can name the three parts of the soul, according to Plato.",
+        "Find someone who can explain Aristotle's 'Golden Mean'.",
+        "A student who knows the famous phrase 'Know Thyself'.",
+        "Someone who has a favorite ancient philosopher.",
+        "Find a student who has read 'The Republic'.",
+        "A student who knows what 'Logos' means in philosophy.",
+        "Someone who thinks Diogenes's lifestyle was admirable.",
+        "Talk to someone who has heard of Pyrrho of Elis (Skepticism).",
+        "A student who has heard of 'the unexamined life'.",
+        "Find someone who knows about the School of Athens painting.",
+        "Someone who can name a non-Platonic philosopher.",
+        "A student who knows who taught Alexander the Great.",
+        "Someone who can explain the difference between Plato and Aristotle.",
+        "Find someone who has a fun fact about Socrates.",
+        "A student who has an opinion on whether philosophy matters today.",
+        "Someone who knows about the death of Socrates.",
+        "A student who knows about the Cynic philosophers.",
+        "Someone who can explain 'Platonic Forms'.",
+        "Find someone who knows what a sophist is.",
+        "Someone who has heard of the philosopher Zeno of Elea.",
+        "Talk to a student who knows what the word 'philosophy' literally means.",
+        "Find someone who knows what a 'telos' is."
+    ];
+
+    const BINGO_SIZE = 5;
+    const TOTAL_SQUARES = BINGO_SIZE * BINGO_SIZE;
+    const gridContainer = document.getElementById('bingo-grid');
+    const newGameBtn = document.getElementById('new-game-btn');
+    const messageBox = document.getElementById('message-box');
+    let boardState = []; // Represents the state of the board squares (daubed or not)
+
+    // Fisher-Yates shuffle algorithm to randomize the phrases.
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // This function creates and populates the bingo grid.
+    function createBingoBoard() {
+        // Clear previous board and state
+        gridContainer.innerHTML = '';
+        messageBox.textContent = '';
+        boardState = Array(TOTAL_SQUARES).fill(false);
+        
+        // Shuffle the phrases to get a unique set for this game
+        const shuffledPhrases = shuffleArray([...bingoPhrases]);
+        
+        // Create the 25 squares
+        for (let i = 0; i < TOTAL_SQUARES; i++) {
+            const square = document.createElement('div');
+            square.classList.add('bingo-square');
+            
+            // Set the free space in the middle (12th index, or i=12 for a 0-indexed array)
+            if (i === Math.floor(TOTAL_SQUARES / 2)) {
+                square.textContent = 'FREE SPACE';
+                square.classList.add('daubed');
+                square.id = 'free-space';
+                boardState[i] = true;
+            } else {
+                // Ensure we have enough unique phrases
+                const phraseIndex = i > Math.floor(TOTAL_SQUARES / 2) ? i - 1 : i;
+                square.textContent = shuffledPhrases[phraseIndex];
+            }
+            
+            // Add a click listener to each square
+            square.addEventListener('click', () => {
+                if (!square.classList.contains('daubed')) {
+                    square.classList.add('daubed');
+                    boardState[i] = true;
+                    checkForWin();
+                }
+            });
+            
+            gridContainer.appendChild(square);
+        }
+    }
+
+    // Checks for a winning condition (5 in a row, column, or diagonal).
+    function checkForWin() {
+        const winningCombinations = [
+            // Rows
+            [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24],
+            // Columns
+            [0, 5, 10, 15, 20], [1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
+            // Diagonals
+            [0, 6, 12, 18, 24], [4, 8, 12, 16, 20]
+        ];
+
+        let hasWon = winningCombinations.some(combination => {
+            return combination.every(index => boardState[index]);
+        });
+
+        if (hasWon) {
+            messageBox.textContent = 'BINGO! You win!';
+            messageBox.classList.add('win-message');
+            // Disable further clicks
+            document.querySelectorAll('.bingo-square').forEach(square => square.style.pointerEvents = 'none');
+        }
+    }
+
+    // Event listener for the "New Game" button
+    newGameBtn.addEventListener('click', () => {
+        messageBox.classList.remove('win-message');
+        createBingoBoard();
+    });
+
+    // Initial board creation when the page loads
+    window.onload = createBingoBoard;
+
+</script>
+
+</body>
+</html>
